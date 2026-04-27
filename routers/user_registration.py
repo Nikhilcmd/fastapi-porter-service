@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from Models import AccountModel,DriverModel,otp_reg
 from Schema import Accounts, Driver, porter
-from database import db, r
+from database import get_db, r
 import secrets
 from enums import Role, Gender
 from pwdlib import PasswordHash
@@ -13,7 +13,7 @@ from datetime import datetime,timezone
 registration_router=APIRouter()
 
 @registration_router.post("/registration")
-def registration(account: AccountModel,db: Session = Depends(db)):
+def registration(account: AccountModel,db: Session = Depends(get_db)):
     if db.query(Accounts).filter(Accounts.mobnum==account.mobnum).first():
         raise HTTPException(status_code=409,detail="The user already exist.")
     if db.query(Accounts).filter(Accounts.email==account.email).first():
@@ -29,7 +29,7 @@ def registration(account: AccountModel,db: Session = Depends(db)):
     return "OTP Sent"
 
 @registration_router.post("/register-verify")
-def register_verify(otp_model:otp_reg ,db: Session=Depends(db)):
+def register_verify(otp_model:otp_reg ,db: Session=Depends(get_db)):
     data=r.get(otp_model.mobnum)
     if data is None:
         raise HTTPException(status_code=410,detail="The otp has expired")
@@ -49,7 +49,7 @@ def register_verify(otp_model:otp_reg ,db: Session=Depends(db)):
         raise HTTPException(status_code=401,detail="The otp was wrong.")
     
 @registration_router.get("/all-users")
-def all_users(db:Session=Depends(db)):
+def all_users(db:Session=Depends(get_db)):
     users=db.query(Accounts).all()
     return users 
 

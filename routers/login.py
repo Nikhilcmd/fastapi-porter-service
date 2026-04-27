@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from Models import otp_login,otp_reg
 from Schema import Accounts
-from database import db, r
+from database import get_db, r
 import secrets
 from pwdlib import PasswordHash
 from enums import Role
@@ -18,7 +18,7 @@ login_router=APIRouter()
 
 
 @login_router.post("/login")
-def login(otp_model:otp_login,db:Session=Depends(db)):
+def login(otp_model:otp_login,db:Session=Depends(get_db)):
     try:
         req_user=db.query(Accounts).filter(otp_model.mobnum==Accounts.mobnum).one()
     except NoResultFound:
@@ -33,7 +33,7 @@ def login(otp_model:otp_login,db:Session=Depends(db)):
     return "OTP sent"
 
 @login_router.post("/login-verify")
-def login_verify(otp:otp_reg,db: Session=Depends(db)):
+def login_verify(otp:otp_reg,db: Session=Depends(get_db)):
      hashed_otp=r.get(otp.mobnum)
      if hashed_otp is None:
          raise HTTPException(status_code=401,detail="The otp was never genrated or it expired.")

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from Models import DriverModel
 from Schema import Accounts, Driver
-from database import db 
+from database import get_db 
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound 
 from auth import get_current_user
@@ -11,7 +11,7 @@ from datetime import datetime,timezone, UTC
 driver_router=APIRouter()
 
 @driver_router.post("/driver-reg")
-def driver_registration(driver:DriverModel,user:str=Depends(get_current_user),db: Session=Depends(db)):
+def driver_registration(driver:DriverModel,user:str=Depends(get_current_user),db: Session=Depends(get_db)):
     if Role(user["role"])== Role.USER:
         if db.query(Driver).filter(Driver.account_id==user["id"]).first():
             raise HTTPException(status_code=409,detail="The user is already registerd or applied.")
@@ -30,7 +30,7 @@ def driver_registration(driver:DriverModel,user:str=Depends(get_current_user),db
     
 
 @driver_router.get("/all-drivers")
-def all_users(db:Session=Depends(db)):
+def all_users(db:Session=Depends(get_db)):
     users=db.query(Driver).all()
     return users 
     
