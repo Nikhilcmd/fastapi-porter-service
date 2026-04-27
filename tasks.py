@@ -15,7 +15,8 @@ def del_user(driver_id):
     try:
        element=session.query(Driver).filter(Driver.id==driver_id).one_or_none()
        if element is None:
-        session.delete(element)
-        session.commit()
+        return "no user found"
+       session.delete(element)
+       session.commit()
     finally:
         session.close() 
