@@ -17,7 +17,13 @@ class DriverModel(BaseModel):
 
 class porterModel(BaseModel):
     pickup_loc:str
+    pickup_loc_long:float
+    pickup_loc_lat:float
     drop_loc: str
+    drop_loc_long: float
+    drop_loc_lat: float
+    
+
 
 class otp_reg(BaseModel):
     mobnum: str

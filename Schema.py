@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column,Integer,String, Enum, DateTime,ForeignKey
+from sqlalchemy import Column,Integer,String, Enum, Float, DateTime,ForeignKey
 
 from enums import Gender,Role,Verification, Status, Vechile_type
 Base= declarative_base()
@@ -31,7 +31,11 @@ class porter(Base):
     user_id=Column(ForeignKey(Accounts.id))
     status=Column(Enum(Status))
     pickup_loc=Column(String(50))
+    pickup_loc_long=Column(Float)
+    pickup_loc_lat=Column(Float)
     drop_loc=Column(String(50))
+    drop_loc_long=Column(Float)
+    drop_loc_lat=Column(Float)
     requested_at=Column(DateTime)
     accepted_at=Column(DateTime)
     collected_at=Column(DateTime)
