@@ -4,6 +4,7 @@ from routers.login import login_router
 from routers.driver_reg import driver_router
 from routers.admin_ver import admin_router
 from routers.porter_req import porter_req
+from routers.accept import porter_accept
 
 app=FastAPI()
 app.include_router(registration_router)
@@ -15,6 +16,8 @@ app.include_router(driver_router)
 app.include_router(admin_router)
 
 app.include_router(porter_req)
+
+app.include_router(porter_accept)
 
 
 
