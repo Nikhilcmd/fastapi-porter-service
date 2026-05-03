@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, WebSocketException
 import jwt
 import os
 from database import r
@@ -12,17 +12,18 @@ driver_loc= APIRouter()
 
 @driver_loc.websocket("/driver_loc")
 async def driver_location(websocket: WebSocket, token: str):
-    try:
-     decode=jwt.decode(token,os.getenv("SECRET_KEY"),algorithms=["HS256"])
-    except jwt.exceptions.ExpiredSignatureError:
-       raise HTTPException(status_code=401,detail="Token Expired")
-    except jwt.exceptions.ImmatureSignatureError:
-       raise HTTPException(status_code=401,detail="Invalid token")
+    
     await websocket.accept()
-    driver_acc_id=decode["id"]
+    
     try:
         while True:
-            
+            try:
+                decode=jwt.decode(token,os.getenv("SECRET_KEY"),algorithms=["HS256"])
+            except jwt.exceptions.ExpiredSignatureError:
+                raise WebSocketException(code=1008,reason="The token expired")
+            except jwt.exceptions.ImmatureSignatureError:
+                raise WebSocketException(code=1008,reason="Invalid token signature.")
+            driver_acc_id=decode["id"]
             data=await websocket.receive_json()
             coords = (data["long"], data["lat"],driver_acc_id)
             r.geoadd("driver_location",coords)
