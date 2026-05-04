@@ -39,7 +39,7 @@ def register_verify(otp_model:otp_reg ,db: Session=Depends(get_db)):
     hash_otp=dic["otp"]
     
     if hashvar.verify(otp,hash=hash_otp):
-        new_user=Accounts(name=dic["name"], email=dic["email"], role=Role.USER, gender=Gender(dic["gender"]), created_at=datetime.now(timezone.utc),mobnum=dic["mobnum"])
+        new_user=Accounts(name=dic["name"], email=dic["email"], role=Role.USER, gender=Gender(dic["gender"]), created_at=datetime.now(timezone.utc).replace(tzinfo=None),mobnum=dic["mobnum"])
         db.add(new_user)
         db.commit()
         r.delete(otp_model.mobnum)

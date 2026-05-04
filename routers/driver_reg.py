@@ -21,7 +21,7 @@ def driver_registration(driver:DriverModel,user:str=Depends(get_current_user),db
             raise HTTPException(status_code=404,detail="The user is not found.")
         except MultipleResultsFound:
             raise HTTPException(status_code=500,detail="Internal server issue.")
-        new_entry=Driver(account_id=user["id"],govt_id=driver.govt_id,Vechile_Number=driver.Vechile_Number,Vechile_type=driver.Vechile_type,verification=Verification.PENDING,ver_updated_at=datetime.now(tz=UTC))
+        new_entry=Driver(account_id=user["id"],govt_id=driver.govt_id,Vechile_Number=driver.Vechile_Number,Vechile_type=driver.Vechile_type,verification=Verification.PENDING,ver_updated_at=datetime.now(tz=UTC).replace(tzinfo=None))
         db.add(new_entry)
         db.commit()
         return "Eureka"

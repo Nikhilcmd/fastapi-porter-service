@@ -33,7 +33,7 @@ def admin_approval(driver_id: int,user: str=Depends(get_current_user),db: Sessio
             raise HTTPException(status_code=500,detail="Something is wrong with the system.")
         #update=driver(verification=Verification.APPROVED,ver_updated_at=datetime.now(tz=UTC))
         driver_val.verification=Verification.APPROVED
-        driver_val.ver_updated_at=datetime.now(tz=UTC)
+        driver_val.ver_updated_at=datetime.now(tz=UTC).replace(tzinfo=None)
         acc_val.role=Role.DRIVER
         db.commit()
         return "wow"
@@ -54,7 +54,7 @@ def admin_reject(driver_id:int,user: str=Depends(get_current_user),db: Session=D
         if driver_val.verification== Verification.REJECTED:
             raise HTTPException(status_code=403,detail="The user is already Rejected.")
         driver_val.verification=Verification.REJECTED
-        driver_val.ver_updated_at=datetime.now(tz=UTC)
+        driver_val.ver_updated_at=datetime.now(tz=UTC).replace(tzinfo=None)
         del_user.apply_async([driver_id],countdown=180)
         return "coolz"
         

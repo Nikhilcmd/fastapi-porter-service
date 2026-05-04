@@ -36,7 +36,7 @@ def accept(req_id:int,user: str=Depends(get_current_user),db:Session=Depends(get
         if Status(req.status)== Status.REQUESTED:
             req.driver_id=driver.id
             req.status=Status.ACCEPTED
-            req.accepted_at=datetime.now(tz=UTC)
+            req.accepted_at=datetime.now(tz=UTC).replace(tzinfo=None)
             db.commit()
             return "Accepted wow"
         else:
