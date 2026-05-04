@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from Schema import Driver, porter
 from database import Sessionlocal, r
 from enums import Status
+from datetime import datetime, UTC, timedelta
 
 import os
 load_dotenv()
@@ -32,6 +33,15 @@ def radius_expansion(self,request_id):
         return "Something went wrong"
        if Status(element.status)!=Status.REQUESTED:
           return "This ride is already accepted."
+       diffrence=datetime.now(tz=UTC).replace(tzinfo=None)-element.requested_at
+       print(element.requested_at)
+       print("This is the diffrence",diffrence)
+       if diffrence > timedelta(seconds=600):
+          print("diffrence is what the hell ", diffrence.total_seconds())
+         #  element.status=Status.CANCELLED
+         #  element.cancelled_at=datetime.now(tz=UTC)
+         #  session.commit()
+          return "This ride is cancelled as no driver found."
        ride_lat=element.pickup_loc_lat
        ride_long=element.pickup_loc_long
        if r.get(f"radius{request_id}") is None:

@@ -13,7 +13,7 @@ porter_req=APIRouter()
 @porter_req.post("/req-porter")
 def porter_request(porter_model: porterModel,user: str=Depends(get_current_user),db: Session=Depends(get_db)):
     if Role(user["role"])!=Role.ADMIN:
-        new_req=porter(user_id=user["id"],status=Status.REQUESTED,pickup_loc=porter_model.pickup_loc,drop_loc=porter_model.drop_loc,requested_at=datetime.now(UTC),pickup_loc_long=porter_model.pickup_loc_long,pickup_loc_lat=porter_model.pickup_loc_lat,drop_loc_long=porter_model.drop_loc_long,drop_loc_lat=porter_model.drop_loc_lat)
+        new_req=porter(user_id=user["id"],status=Status.REQUESTED,pickup_loc=porter_model.pickup_loc,drop_loc=porter_model.drop_loc,requested_at=datetime.now(UTC).replace(tzinfo=None),pickup_loc_long=porter_model.pickup_loc_long,pickup_loc_lat=porter_model.pickup_loc_lat,drop_loc_long=porter_model.drop_loc_long,drop_loc_lat=porter_model.drop_loc_lat)
         db.add(new_req)
         db.commit()
         radius_expansion.apply_async([new_req.id])
