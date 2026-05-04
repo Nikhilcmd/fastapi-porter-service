@@ -38,28 +38,25 @@ def radius_expansion(self,request_id):
        print("This is the diffrence",diffrence)
        if diffrence > timedelta(seconds=600):
           print("diffrence is what the hell ", diffrence.total_seconds())
-         #  element.status=Status.CANCELLED
-         #  element.cancelled_at=datetime.now(tz=UTC)
-         #  session.commit()
+          element.status=Status.CANCELLED
+          element.cancelled_at=datetime.now(tz=UTC)
+          session.commit()
           return "This ride is cancelled as no driver found."
        ride_lat=element.pickup_loc_lat
        ride_long=element.pickup_loc_long
-       if r.get(f"radius{request_id}") is None:
-          r.set(f"radius{request_id}",2)
-       rad=int(r.get(f"radius{request_id}"))
+       n=r.incr(f"radius:{request_id}",amount=1)
        
-       vri=r.geosearch("driver_location",None,ride_long,ride_lat,"km",rad,sort="ASC",withdist=True)
-       if rad < 9:
-          r.set(f"radius{request_id}",rad+1)
+       vri=r.geosearch("driver_location",None,ride_long,ride_lat,"km",min(n+1,9),sort="ASC",withdist=True)
        
-       print("this is rad ", rad)
+       
        print(vri)
+       print("This is the radius",min(n+1,9))
 
        for t in vri:
           if r.get(f"driver_online:{t[0]}") is not None:
              print("this is", t[0])
              r.zadd(f"eligible_drivers:{request_id}",{t[0]:t[1]},nx=True)
-             r.expire(f"eligible_drivers:{request_id}",time=60)
+       r.expire(f"eligible_drivers:{request_id}",time=60)
        radius_expansion.apply_async([request_id],countdown=30)
              
    finally:
