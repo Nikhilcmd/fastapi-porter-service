@@ -16,14 +16,17 @@ def accept(req_id:int,user: str=Depends(get_current_user),db:Session=Depends(get
     if Role(user["role"])== Role.DRIVER:
         try:
             driver=db.query(Driver).filter(Driver.account_id==user["id"]).one()
+            req=db.query(porter).filter(req_id==porter.id).with_for_update().one()
             driver_eligible=db.query(porter).filter(porter.driver_id==driver.id, or_(porter.status==Status.ACCEPTED , porter.status==Status.STARTED, porter.status==Status.COLLECTED,porter.status==Status.REACHED)).one_or_none()
-            # print(r.get(f"eligible_drivers:{req_id}"))
+
+
+            
             if str(driver.account_id) not  in r.zrange(f"eligible_drivers:{req_id}",start=0,end=-1):
                 raise HTTPException(status_code=403,detail="You are not allowed to accept this request. distance")
 
             if driver_eligible != None:
                 raise HTTPException(status_code=403,detail="You are not allowed to take up this request.")
-            req=db.query(porter).filter(req_id==porter.id).with_for_update().one()
+            
             
         except NoResultFound:
             raise HTTPException(status_code=404,detail="The request is not found.")
