@@ -6,6 +6,7 @@ from routers.admin_ver import admin_router
 from routers.porter_req import porter_req
 from routers.accept import porter_accept
 from routers.driver_location import driver_loc
+from routers.driver_lifecycle import porter_lifecycle
 
 app=FastAPI()
 app.include_router(registration_router)
@@ -21,6 +22,8 @@ app.include_router(porter_req)
 app.include_router(porter_accept)
 
 app.include_router(driver_loc)
+
+app.include_router(porter_lifecycle)
 
 
 
