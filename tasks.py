@@ -51,6 +51,9 @@ def radius_expansion(self,request_id):
        cords=[]
        ride_lat=element.pickup_loc_lat
        ride_long=element.pickup_loc_long
+       ride_pickup=element.pickup_loc
+       ride_drop=element.drop_loc
+
        try:
          n=r.incr(f"radius:{request_id}",amount=1)
          r.expire(f"radius:{request_id}",time=1020,nx=True)
@@ -74,6 +77,7 @@ def radius_expansion(self,request_id):
             logger.debug(f"this is{driverid}:{cords}")
             if driverid is not None:
                r.zadd(f"eligible_drivers:{request_id}",{driverid:cords},nx=True)
+               r.publish(f"driver:{driverid}",f"pickup: {ride_pickup} and Drop is{ride_drop}")# websocket send info
          r.expire(f"eligible_drivers:{request_id}",time=60)
          radius_expansion.apply_async([request_id],countdown=30)
        except TimeoutError as e:
