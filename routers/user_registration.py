@@ -26,7 +26,9 @@ def registration(account: AccountModel,db: Session = Depends(get_db)):
     
     # r.set(json.dump(new_user),ex=180)
     r.set(account.mobnum,json.dumps(new_user),ex=180)
-    return "OTP Sent"
+    #return "OTP Sent"\
+    #returning otp for test
+    return otp
 
 @registration_router.post("/register-verify")
 def register_verify(otp_model:otp_reg ,db: Session=Depends(get_db)):

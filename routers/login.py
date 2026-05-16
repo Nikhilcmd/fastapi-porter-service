@@ -30,7 +30,8 @@ def login(otp_model:otp_login,db:Session=Depends(get_db)):
     hashed_otp=hashvr.hash(otp)
     r.set(otp_model.mobnum,hashed_otp,ex=180)
     print(otp)
-    return "OTP sent"
+    #returnig otp for testing
+    return otp
 
 @login_router.post("/login-verify")
 def login_verify(otp:otp_reg,db: Session=Depends(get_db)):
