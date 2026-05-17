@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes: 
+     - postgres_data:/var/lib/postgresql/data
+  
+    networks:
+      - app-network
+
+  fastapi:
+    build: .
+    container_name: backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DOCKER_DATABASE_URL}
+      SECRET_KEY: ${SECRET_KEY}
+      REDIS_HOST_NAME: redis
+      REDIS_URL: ${REDIS_URL}
+      CELERY_URL: ${REDIS_URL}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - app-network
+
+  celery:
+    build: .
+    container_name: celery
+    environment:
+      DATABASE_URL: ${DOCKER_DATABASE_URL}
+      SECRET_KEY: ${SECRET_KEY}
+      REDIS_HOST_NAME: redis
+      REDIS_URL: ${REDIS_URL}
+      CELERY_URL: ${REDIS_URL}
+    command: "celery -A tasks worker --loglevel=INFO"
+    depends_on:
+      - redis
+    networks:
+      - app-network
+
+  redis:
+    image: redis
+    container_name: cacheing_porter
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+
+volumes:
+ postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
+
+
